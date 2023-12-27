@@ -1,0 +1,7 @@
+Liquidacion de sueldos 
+Ley 20744
+deducciones retenciones a la seguridad 
+    Jubilacion 11%
+    Obra social 3%
+    ley 19032 3%
+    sindicato 3%

@@ -1,0 +1,86 @@
+-- Previenen alteraciones en las tablas(Instead of)
+-- impiden actualizar, insertar o borrar datos
+-- ultima parte podemos deshabilitar el trigger
+
+--Creamos tablas e inserto algunos datos
+CREATE TABLE control_PRODUCTOS(
+	usuario varchar(30),
+	fecha date,
+	hora varchar(20),
+	accion varchar(50)
+);
+CREATE TABLE PRODUCTOS(
+	IDPRODUCTO INT PRIMARY KEY NOT NULL,
+	NOMBRE VARCHAR(100),
+	PRECIO_UNIDAD FLOAT,
+	EXISTENCIA INT,
+	VENDIDOS INT NUll
+);
+INSERT INTO PRODUCTOS (IDPRODUCTO, NOMBRE, PRECIO_UNIDAD, EXISTENCIA, VENDIDOS)
+VALUES
+(1, 'Martillo', 15.99, 100, 20),
+(2, 'Destornillador Phillips', 8.50, 150, 30),
+(3, 'Llave Inglesa', 12.75, 120, 15),
+(4, 'Sierra de Mano', 25.50, 80, 10),
+(5, 'Clavos (paquete de 100)', 3.99, 200, 50),
+(6, 'Taladro Inalámbrico', 79.99, 50, 5),
+(7, 'Cinta Métrica', 6.25, 180, 25),
+(8, 'Pintura Latex (galón)', 20.00, 60, 12),
+(9, 'Lija (paquete de 10)', 4.50, 120, 18),
+(10, 'Tornillos Variados (set)', 5.99, 100, 20);
+
+--Crea el trigger guardian que no deja insertar
+CREATE OR ALTER TRIGGER TR_BLOCKINSERT_PRODUCTOS
+ON PRODUCTOS
+INSTEAD OF INSERT
+AS
+	BEGIN
+	SET NOCOUNT ON--BLOQUEAR SALIDA DE DATOS POR CONSOLA
+	INSERT INTO CONTROL_PRODUCTOS VALUES
+	(SUSER_NAME(), GETDATE(), RIGHt(GETDATE(),8),'Intentó un insert');
+	PRINT 'No es posible insertar datos en esa tabla'
+	END;
+
+INSERT INTO PRODUCTOS VALUES(11,'Soldador electrico',80.20,4,0);
+
+--No deja actualizar los datos
+CREATE OR ALTER TRIGGER TR_BLOCKUPDATE_PRODUCTOS
+ON PRODUCTOS
+INSTEAD OF UPDATE
+AS
+	BEGIN
+	SET NOCOUNT ON--BLOQUEAR SALIDA DE DATOS POR CONSOLA
+	INSERT INTO CONTROL_PRODUCTOS VALUES
+	(SUSER_NAME(), GETDATE(), RIGHt(GETDATE(),8),'Intentó un UPDATE');
+	PRINT 'No es posible ACTUALIZAR datos en esa tabla'
+	END;
+
+UPDATE PRODUCTOS SET PRECIO_UNIDAD = 10 WHERE IDPRODUCTO = 3;
+
+--No deja borrar los datos
+CREATE OR ALTER TRIGGER TR_BLOCKDELETE_PRODUCTOS
+ON PRODUCTOS
+INSTEAD OF DELETE
+AS
+	BEGIN
+	SET NOCOUNT ON--BLOQUEAR SALIDA DE DATOS POR CONSOLA
+	INSERT INTO CONTROL_PRODUCTOS VALUES
+	(SUSER_NAME(), GETDATE(), RIGHt(GETDATE(),8),'Intentó un BORRAR');
+	PRINT 'No es posible BORRAR datos en esa tabla'
+	END;
+
+DELETE PRODUCTOS WHERE IDPRODUCTO = 3;
+SELECT * FROM control_productos;
+SELECT * FROM productos;
+
+--Deshabilitamos los trigger
+-- no quiero borrar
+--DROP TRIGGER NOMBRE
+INSERT INTO PRODUCTOS VALUES(11,'Soldadora',22,32,12);
+--Se puede insertar deshabilitando el trigger
+ALTER TABLE PRODUCTOS
+DISABLE TRIGGER TR_BLOCKINSERT_PRODUCTOS;
+--Lo habilita otra vez
+ALTER TABLE PRODUCTOS
+ENABLE TRIGGER TR_BLOCKINSERT_PRODUCTOS;
+

@@ -1,17 +1,11 @@
-use pruebasCheck
-create table prueba(
-	id int null,
-	nombre varchar(10),
-	fecha date,
-	cantidad numeric(3,2)
-);
+-- Se creo trigger individual para insert, update y delete
 CREATE TABLE CONTROL(
 	usuario varchar(30),
 	fecha date,
 	accion varchar(50)
 );
 SELECT * FROM prueba;
-
+--creamos trigger insert
 CREATE OR ALTER TRIGGER t_inserta
 ON prueba
 after insert
@@ -25,18 +19,6 @@ end;
 INSERT INTO prueba VALUES(1,'Sergio',getdate(),1.5);
 INSERT INTO prueba VALUES (2,'Puchatt','20240101',2);
 SELECT * FROM control;
-
---creacion trigger update
-CREATE OR ALTER TRIGGER t_update
-ON prueba
-AFTER UPDATE
-AS
-	BEGIN
-		DECLARE @usuario varchar(30);
-		SET @USUARIO = SUSER_NAME();
-		INSERT INTO CONTROL VALUES(@usuario,getdate(),'update');
-END;
-UPDATE prueba SET id = 2 WHERE id = 1;
 
 --creacion trigger update
 CREATE OR ALTER TRIGGER t_update

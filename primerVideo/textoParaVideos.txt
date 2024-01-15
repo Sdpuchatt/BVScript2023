@@ -1,0 +1,8 @@
+En este video vamos a hablar sobre la creacion de concepto de sueldo segun ticket 11.363
+y el  11.399. vamos a ver como se creo el concepto 80500 y para eso vamos a simular su creacion,
+ creando como practica el concepto 80498 con los mismos datos del 80500
+ 
+ D - descuentos
+ H haberes remunerativos
+ E haberes no remunerativosc 
+ C - calculo intermedio 

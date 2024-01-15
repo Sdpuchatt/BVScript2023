@@ -1,0 +1,68 @@
+--Se creo un trigger y se fija si actualizo , se inserto o se borro algun dato en un mismo trigger
+-con algunos if exists
+CREATE TABLE control_emple(
+	usuario varchar(30),
+	fecha date,
+	hora varchar(20),
+	accion varchar(50)
+);
+CREATE TABLE empleados(
+	id_empleado int primary key not null,
+	nombre varchar(50),
+	apellido varchar(50),
+	direccion varchar(100),
+	puesto varchar(50),
+	sueldo float,
+	cant_hijos int
+);
+
+INSERT INTO empleados (id_empleado, nombre, apellido, direccion, puesto, sueldo, cant_hijos)
+VALUES
+(1, 'Juan', 'Gómez', 'Calle 123, Ciudad', 'Gerente', 50000.00, 2),
+(2, 'María', 'López', 'Avenida Principal, Pueblo', 'Analista de Sistemas', 40000.00, 1),
+(3, 'Carlos', 'Martínez', 'Calle Central, Villa', 'Contador', 45000.00, 0),
+(4, 'Laura', 'Ramírez', 'Avenida 456, Poblado', 'Asistente Administrativo', 35000.00, 3),
+(5, 'Miguel', 'Hernández', 'Calle Secundaria, Ciudad', 'Desarrollador de Software', 48000.00, 2),
+(6, 'Ana', 'García', 'Avenida Norte, Pueblo', 'Diseñador Gráfico', 42000.00, 1),
+(7, 'Javier', 'Pérez', 'Calle Oeste, Villa', 'Analista de Recursos Humanos', 47000.00, 2),
+(8, 'Patricia', 'Díaz', 'Avenida Sur, Poblado', 'Especialista en Marketing', 38000.00, 0),
+(9, 'Roberto', 'Castillo', 'Calle Este, Ciudad', 'Ingeniero de Proyectos', 52000.00, 1),
+(10, 'Sandra', 'Ortega', 'Avenida Principal, Villa', 'Asistente de Ventas', 36000.00, 2);
+
+--Creamos trigger
+CREATE OR ALTER TRIGGER tr_control_emple
+ON EMPLEADOS
+FOR INSERT, UPDATE, DELETE
+AS
+	DECLARE
+	 @hora varchar(20) = right(getdate(),8);
+	IF EXISTS(SELECT 0 FROM INSERTED)
+		BEGIN
+			IF EXISTS(SELECT 0 FROM DELETED)
+				BEGIN 
+				INSERT INTO CONTROL_EMPLE 
+				VALUES (SUSER_NAME(),GETDATE(),@HORA,'ACTUALIZÓ EN LA TABLA EMPLEADOS');
+				END
+			ELSE
+				BEGIN
+				INSERT INTO CONTROL_EMPLE 
+				VALUES (SUSER_NAME(),GETDATE(),@HORA,'INSERTÓ EN LA TABLA EMPLEADOS');
+				END
+		END
+	ELSE
+		BEGIN
+		INSERT INTO CONTROL_EMPLE VALUES
+		(SUSER_NAME(),GETDATE(),@HORA,'BORRÓ EN LA TABLA EMPLEADOS')
+		END;
+--probamos insert
+INSERT INTO EMPLEADOS VALUES
+(11,'Manuel','Gonzales','Direccion 3030','Tecnico',60000,1);
+INSERT INTO EMPLEADOS VALUES
+(12,'Jose','Lopez','Direccion 7119','Maquinista',150000,5);
+-- actualizamos
+UPDATE EMPLEADOS SET SUELDO = 200000 WHERE id_empleado = 12;
+--borramos un campo
+DELETE FROM EMPLEADOS WHERE ID_EMPLEADO = 1;
+
+SELECT * FROM control_emple;
+SELECT * FROM empleados;

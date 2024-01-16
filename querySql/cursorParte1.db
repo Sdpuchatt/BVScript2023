@@ -1,0 +1,122 @@
+USE pruebasCheck
+DECLARE --DECLARA VARIABLE
+	@DESCRIPCION NUMERIC(6,2);
+DECLARE --DECLARA CURSOR
+	PROD_INFO CURSOR FOR --nombre cursor
+	SELECT PRECIO_UNIDAD FROM PRODUCTOS --Esto es lo que va a guardar dentro del cursor
+	OPEN PROD_INFO --abro , voy a usar el cursor
+	FETCH NEXT FROM PROD_INFO INTO @DESCRIPCION -- Extraccion de cada registro dentro del cursor
+	WHILE @@FETCH_STATUS=0 -- Si todo esta bien
+	BEGIN
+		PRINT @DESCRIPCION -- mostrar en pantalla
+		FETCH NEXT FROM PROD_INFO INTO @DESCRIPCION
+	END
+	CLOSE PROD_INFO -- cierra el cursor
+	DEALLOCATE PROD_INFO --Liberar recursos asociados al cursor libera memoria
+
+
+-- cursor de solo lectura
+DECLARE --declara variables
+	@ID INT,
+	@NOMBRE VARCHAR(50),
+	@PRECIO NUMERIC(6,2),
+	@EXISTENCIA INT,
+	@VENDIDOS INT;
+DECLARE
+	CU_PRODUCTOS CURSOR LOCAL STATIC READ_ONLY -- MI SESSION DE USUARIO SOLO LECTURA
+	FOR SELECT IDPRODUCTO, NOMBRE, PRECIO_UNIDAD,
+				EXISTENCIA, VENDIDOS FROM PRODUCTOS;
+	OPEN CU_PRODUCTOS;
+	FETCH NEXT FROM CU_PRODUCTOS
+	INTO @ID, @NOMBRE, @PRECIO, @EXISTENCIA, @VENDIDOS
+	WHILE @@FETCH_STATUS = 0
+		BEGIN
+			--SELECT STR(@ID) + @NOMBRE + STR(@PRECIO) + STR(@EXISTENCIA) + STR(@VENDIDOS);
+			PRINT STR(@ID) + @NOMBRE + STR(@PRECIO) + STR(@EXISTENCIA) + STR(@VENDIDOS);
+			FETCH NEXT FROM CU_PRODUCTOS INTO @ID, @NOMBRE, @PRECIO, @EXISTENCIA,@VENDIDOS;
+		END;
+	CLOSE CU_PRODUCTOS;
+	DEALLOCATE CU_PRODUCTOS;
+
+--SELECT * FROM PRODUCTOS;
+-- CREAMOS CURSOR PARA AUMENTAR SALARIO A SECRETARIA
+DECLARE
+	@IDEMPLEADO INT,
+	@NUEVOSALARIO NUMERIC(10,2)
+DECLARE
+	CU_SALARIOS CURSOR FOR
+	SELECT IDEMPLEADO, SALARIO FROM EMPLEADOS1
+	WHERE PUESTO = 'SECRETARIA'
+OPEN CU_SALARIOS
+FETCH NEXT FROM CU_SALARIOS INTO @IDEMPLEADO, @NUEVOSALARIO
+WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @NUEVOSALARIO = @NUEVOSALARIO*1.10;
+		UPDATE EMPLEADOS1 SET SALARIO = @NUEVOSALARIO
+		WHERE CURRENT OF CU_SALARIOS;
+		FETCH NEXT FROM CU_SALARIOS INTO @IDEMPLEADO, @NUEVOSALARIO
+	END;
+CLOSE CU_SALARIOS;
+DEALLOCATE CU_SALARIOS;
+
+
+
+
+
+
+
+
+drop table empleados1;
+CREATE TABLE empleados1 (
+    idempleado INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    direccion VARCHAR(200),
+    telefono VARCHAR(20),
+    puesto VARCHAR(50),
+    salario DECIMAL(10, 2),
+    activo char(2)
+);
+SELECT * FROM EMPLEADOS1;
+SELECT IDEMPLEADO,PUESTO,SALARIO FROM EMPLEADOS1 WHERE PUESTO = 'SECRETARIA'
+INSERT INTO empleados1 (idempleado, nombre, direccion, telefono, puesto, salario, activo)
+VALUES
+    (1, 'Juan Perez', 'Avenida 123', '1234567890', 'Gerente', 750000.00, 'si'),
+    (2, 'Ana Martinez', 'Calle 456', '2345678901', 'Asistente', 550000.00, 'si'),
+    (3, 'Carlos Rodriguez', 'Callejon 789', '3456789012', 'Encargado de Operaciones', 600000.00, 'si'),
+    (4, 'María González', 'Plaza 101', '4567890123', 'Vendedor', 480000.00, 'si'),
+    (5, 'Luisa Sánchez', 'Paseo 202', '5678901234', 'Soporte Técnico', 520000.00, 'si'),
+    (6, 'Pedro Ramirez', 'Alameda 303', '6789012345', 'Secretaria', 450000.00, 'si'),
+    (7, 'Diego Morales', 'Jardín 404', '7890123456', 'Conserje', 400000.00, 'si'),
+    (8, 'Fernanda Cruz', 'Avenida 555', '8901234567', 'Gerente', 780000.00, 'si'),
+    (9, 'Sofía López', 'Calle 606', '9012345678', 'Asistente', 580000.00, 'si'),
+    (10, 'Andrés Herrera', 'Callejon 707', '0123456789', 'Encargado de Operaciones', 620000.00, 'si'),
+    (11, 'Jorge Fernández', 'Plaza 808', '1234567890', 'Vendedor', 510000.00, 'si'),
+    (12, 'Mónica Silva', 'Paseo 909', '2345678901', 'Soporte Técnico', 530000.00, 'si'),
+    (13, 'Roberto Mendoza', 'Alameda 010', '3456789012', 'Secretaria', 460000.00, 'si'),
+    (14, 'Laura Vargas', 'Jardín 111', '4567890123', 'Conserje', 410000.00, 'si'),
+    (15, 'Gabriel Reyes', 'Avenida 121', '5678901234', 'Gerente', 800000.00, 'si'),
+    (16, 'Carmen Navarro', 'Calle 131', '6789012345', 'Asistente', 600000.00, 'si'),
+    (17, 'Ricardo Paredes', 'Callejon 141', '7890123456', 'Encargado de Operaciones', 640000.00, 'si'),
+    (18, 'Isabel Ríos', 'Plaza 151', '8901234567', 'Vendedor', 530000.00, 'si'),
+    (19, 'Daniel Ortiz', 'Paseo 161', '9012345678', 'Soporte Técnico', 550000.00, 'si'),
+    (20, 'Patricia Castro', 'Alameda 171', '0123456789', 'Secretaria', 480000.00, 'si'),
+    (21, 'Raúl Medina', 'Avenida 222', '1234567890', 'Vendedor', 500000.00, 'si'),
+    (22, 'Camila Torres', 'Calle 333', '2345678901', 'Soporte Técnico', 540000.00, 'si'),
+    (23, 'Javier Gómez', 'Callejon 444', '3456789012', 'Secretaria', 470000.00, 'si'),
+    (24, 'Lucía Varela', 'Plaza 555', '4567890123', 'Conserje', 420000.00, 'si'),
+    (25, 'Eduardo Fuentes', 'Paseo 666', '5678901234', 'Gerente', 820000.00, 'si'),
+    (26, 'Valentina Mendoza', 'Alameda 777', '6789012345', 'Asistente', 610000.00, 'si'),
+    (27, 'Héctor Soto', 'Jardín 888', '7890123456', 'Encargado de Operaciones', 660000.00, 'si'),
+    (28, 'Marcela Paredes', 'Avenida 999', '8901234567', 'Vendedor', 520000.00, 'si'),
+    (29, 'Gustavo Ríos', 'Calle 1010', '9012345678', 'Soporte Técnico', 560000.00, 'si'),
+    (30, 'Natalia Navarro', 'Callejon 1111', '0123456789', 'Secretaria', 490000.00, 'si'),
+    (31, 'Roberto Ortega', 'Plaza 1212', '1234567890', 'Conserje', 430000.00, 'si'),
+    (32, 'María Fernández', 'Paseo 1313', '2345678901', 'Gerente', 840000.00, 'si'),
+    (33, 'Julián Silva', 'Alameda 1414', '3456789012', 'Asistente', 630000.00, 'si'),
+    (34, 'Mariana Vargas', 'Jardín 1515', '4567890123', 'Encargado de Operaciones', 680000.00, 'si'),
+    (35, 'Santiago López', 'Avenida 1616', '5678901234', 'Vendedor', 540000.00, 'si'),
+    (36, 'Isabella Cruz', 'Calle 1717', '6789012345', 'Soporte Técnico', 580000.00, 'si'),
+    (37, 'Andrés Mora', 'Callejon 1818', '7890123456', 'Secretaria', 500000.00, 'si'),
+    (38, 'Valeria Torres', 'Plaza 1919', '8901234567', 'Conserje', 450000.00, 'si'),
+    (39, 'Fernando García', 'Paseo 2020', '9012345678', 'Gerente', 860000.00, 'si'),
+    (40, 'Carolina Morales', 'Alameda 2121', '0123456789', 'Asistente', 640000.00, 'si');

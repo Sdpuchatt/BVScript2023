@@ -1,3 +1,7 @@
+/**Creamos una carpeta api, usamos comando npm init -y
+ * me genera el archivo package.json, luego usamos el 
+ * comando npm install -S express me genera los codigos node_modules
+ */
 const express = require('express');
 const user = require('./user.controller')
 const app = express();

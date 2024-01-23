@@ -1,6 +1,7 @@
 /**Creamos una carpeta api, usamos comando npm init -y
  * me genera el archivo package.json, luego usamos el 
  * comando npm install -S express me genera los codigos node_modules
+ * usaremos mongoose
  */
 const express = require('express');
 const user = require('./user.controller')
@@ -8,7 +9,7 @@ const app = express();
 const port = 3000;
 
 app.get('/',(req,res)=>{
-    res.status(200).send('Chanchito feliz')
+    res.status(200).send('<h1>Chanchito feliz</h1>')
 })
 app.post('/',(req,res)=>{
     res.status(201).send('creando chanchito')

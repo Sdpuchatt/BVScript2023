@@ -17,7 +17,7 @@ const buscarTodo = async () => {
     const users = await User.find()
     console.log(users)
 }
-//buscarTodo()
+buscarTodo()
 const buscar = async () => {
     const user = await User.find({ username: 'chanchito trizte'})
     console.log(user)
@@ -40,7 +40,7 @@ const eliminar = async () => {
     const user = await User.findOne({username : 'chanchito trizte'})
     console.log(user)
     if(user){
-        await user.remove()
+        await user.deleteOne()
     }
 }
-eliminar()
+// eliminar()

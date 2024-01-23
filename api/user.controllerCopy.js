@@ -1,10 +1,8 @@
-const User = require('./User')
 const User = {
     get: (req,res) =>{
         res.status(200).send('este es un chanchito =D')
     },
     list: (req,res) =>{
-        const users = await Users.find()
         res.status(200).send('Hola chanchito!')
     },
     create: (req,res)=>{

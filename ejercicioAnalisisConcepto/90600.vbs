@@ -1,0 +1,38 @@
+'90600 ADMINISTRACION - Seguro de Accidente
+'Formula planilla
+IF(cpt_00045=100,legajo.acum("ARTASI"),0)
+
+'Se pasa s VBscript
+CPT_00045 = LEGAJO.CONCEPTO(CPT_00045) 'Centro de Costos
+ARTASI = LEGAJO.ACUM("ARTASI") 'Contribucion ART para asiento
+
+IF(CPT_00045 = 100)THEN
+    RESULT = ARTASI
+ELSE
+    RESULT = 0
+END IF
+
+'90400 ADMINISTRACION - Seguro de Vida
+'fORMULA PLANILLA
+IF(CPT_00045=100,CPT_80120,0)
+'Se paso a VBScript
+CPT_00045 = LEJAGO.CONCEPTO("CPT_00045") 'Centro de Costos
+CPT_80120 = LEGAJO.CONCEPTO("CPT_80120") 'Contribucion Seguro de Vida
+
+IF(CPT_00045 = 100)THEN
+    RESULT = CPT_80120
+ELSE
+    RESULT = 0
+END IF
+
+'90200 ADMINISTRACION - Cargas Sociales SUSS
+IF(cpt_00045=100,legajo.acum("CONASI"),0)
+'VBScript
+CPT_00045 = LEGAJO.CONCEPTO = (CPT_0045)
+CONASI = LEGAJO.ACUM("CONASI") 'Contribuciones para Asiento
+
+IF(CPT_00045 = 100)THEN
+    RESULT = CONASI
+ELSE
+    RESULT = 0
+END IF

@@ -3,7 +3,7 @@ const User = {
     get: async (req,res) =>{
         const {id} = req.params
         const user = await Users.findOne({_id : id})
-        res.status(200).send('este es un chanchito =D')
+        res.status(200).send(user)
     },
     list: async (req,res) =>{
         const users = await Users.find()

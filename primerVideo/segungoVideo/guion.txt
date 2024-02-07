@@ -1,0 +1,52 @@
+En este video vamos a ver la Resolucion de ticket 11475 trata sobre los reportes 
+"Carta para sindicatos"
+Se cambio de version en una empresa de Softland 3.5 a 4.5
+Luego de esto el cliente nos informa que al ejecutar algunos reportes
+en este caso "Carta para sindicatos" traia menos registros de lo que deberia traer, 
+en comparacion con la antigua version.
+El cliente nos dio un legajo de ejemplo el cual el reporte deberia traer y no esta trayendo.
+Para analizar el caso intentamos ver si existian ticket anteriores con algun problema similar, 
+no tuvimos suerte.
+Luego en Base de datos comparamos las liquidaciones entre: el legajo que no aparecia con uno que si aprece en el reporte. 
+Encontramos que en el legajo que SI aparecia en el reporte tenia dos registros para un
+mismo tipo de liquidacion(F).
+Resulta que un registro era la liquidacion con el campo SJRMVH_CODFOR = 'L'  y el otro registro
+correspondia al cierre SJRMVH_CODFOR = 'C'.
+Con la nueva version el sistema Softland deja de generar un nuevo registro(tupla) para el cierre
+y solamente se limita a actualizar el campo SJRMVH_CIERRE = 'S'.
+
+    Tengamos en cuenta que un reporte es una herramienta/aplicacion de softland que nos permite
+    obtener los datos de las tablas y hacer diferentes tareas. En este caso lo usamos para generar una 
+    imagen formateada. El reporte en su proceso interno para poder funcionar usa UNA SUPER
+    CONSULTA SQL la cual como todo querie sql tiene un "where" para filtrar.
+    Por lo tanto: Si el reporte te trae menos registro de lo que deberia traer podriamos  concluir
+    que el problema esta en el filtro de la "super consulta".
+
+Para entrar al reporte hacemos click derecho editar definicion.
+Vamos al filtro y encontramos que se utilizado SJRMVH_CODFOR = 'C'.
+Simplemente modificamos el filtro cambiandolo por el campo SJRMVH_CIERRE = 'S'.
+
+
+AND SJRMVH_CIERRE = 'S')
+SJRMVH_CODFOR = 'C')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--BÚSQUEDA DE LIQUIDACIÓN (HEADER)
+SELECT SJRMVH_CODFOR,SJRMVH_CIERRE, SJRMVH_PERIOD, SJRMVH_TIPLIQ, SJRMVH_NROLEG, SJRMVH_CLAEMP, SJRMVH_CIERRE, SJRMVH_FECALT FROM SJRMVH WHERE SJRMVH_PERIOD = 202401  
+AND SJRMVH_NROLEG = 230 
+
+
+SELECT SJRMVH_CODFOR,SJRMVH_CIERRE, SJRMVH_PERIOD, SJRMVH_TIPLIQ, SJRMVH_NROLEG, SJRMVH_CLAEMP, SJRMVH_CIERRE, SJRMVH_FECALT FROM SJRMVH WHERE SJRMVH_PERIOD = 202401  
+AND SJRMVH_NROLEG = 38 

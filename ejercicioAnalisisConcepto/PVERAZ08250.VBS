@@ -1,0 +1,110 @@
+NOVEDAD = LEGAJO.CONCEPTO("NOVI_08250") 
+CLAEMP = LEGAJO.CONCEPTO("VLIQ_CLAEMP")
+SIZONA = LEGAJO.CONCEPTO("VLEG_SIZONA") 'Empleado Fuera de Convenio que calcula Zona Desfavorable
+SECTOR = LEGAJO.CONCEPTO("CPT_00095") 'Sector     
+VALOR_HORA = LEGAJO.CONCEPTO("CPT_01300") 'Valor Hora Normal
+VALOR_BASICO = LEGAJO.CONCEPTO("CPT_02000") 'Valor Basico por Categoria
+BASICO_STIA = LEGAJO.CONCEPTO("CPT_02600") 'Sueldo Basico STIA
+HORAS = LEGAJO.CONCEPTO("CPT_06000")'Horas Normales
+FERIADO = LEGAJO.CONCEPTO("CPT_06010") 'Feriado Nacional
+NOV_LANG1 = LEGAJO.CONCEPTO("CPT_07490") 'Lang. Ent. X 1Kg. *
+NOV_LANG2 = LEGAJO.CONCEPTO("CPT_07500") 'Lang. Ent. X 2Kg. * 'este   NOV_LANG2 + NOV_COLAGRA + KILOS_CONV
+NOV_COLAGRA = LEGAJO.CONCEPTO("CPT_07510") 'Cola Granel *     'este
+KILOS_CONV = LEGAJO.CONCEPTO("CPT_07520") 'Kilos Convertidos  '
+LANG1 = LEGAJO.CONCEPTO("CPT_07990") 'Lang. Ent. X 1Kg.
+LANG2 = LEGAJO.CONCEPTO("CPT_08000") 'Lang. Ent. X 2Kg.
+COLAGRA = LEGAJO.CONCEPTO("CPT_08010") 'Cola Granel
+NOV_PROD = LEGAJO.CONCEPTO("CPT_08035") 'Produccion*
+CANT_HORA = LEGAJO.CONCEPTO("CPT_00210") 'CANT  Hora Normal
+
+CATEGORIA = LEGAJO.CONCEPTO("CPT_00060") ' Categoria de legajo
+
+VCPT_08250_CONST1 = LEGAJO.CONCEPTO("VCPT_08250_CONST1") 
+TADZON = LEGAJO.ACUM("TADZON") 'Cantidad de Horas para adicional Zona
+
+IF (NOVEDAD <> 0) THEN
+    RESULT = NOVEDAD
+ELSE
+    IF (SIZONA = "S") THEN
+        RESULT = 0
+    ELSE
+
+        IF (CLAEMP <> "MR" OR CLAEMP = "JR") THEN
+
+            IF (SECTOR = 1) THEN
+        
+                IF (CATEGORIA = "203") THEN
+        
+                    PRODUCCION = (NOV_LANG1+LANG1+NOV_LANG2+LANG2+NOV_COLAGRA+COLAGRA+KILOS_CONV+NOV_PROD)
+        
+                    RESULT = PRODUCCION*VCPT_08250_CONST1
+        
+                ELSE
+        
+                    IF (HORAS > KILOS_CONV) THEN
+                        BASE = (CANT_HORA*VALOR_HORA)
+                    ELSE
+                        BASE = KILOS_CONV
+                    END IF
+                    
+                    RESULT = BASE*VCPT_08250_CONST1
+
+                END IF
+
+            ELSE
+                RESULT = (LANG1+LANG2+COLAGRA+NOV_PROD+FERIADO+(VALOR_HORA*CANT_HORA))*VCPT_08250_CONST1
+            END IF
+
+        ELSE
+
+            IF (CLAEMP = "MENS" OR CLAEMP = "MR") THEN
+                RESULT = (((VALOR_BASICO/200)*TADZON)+BASICO_STIA)*VCPT_08250_CONST1
+            ELSE
+                RESULT = 0
+            END IF
+
+        END IF
+
+    END IF
+END IF
+
+
+
+'CONCEPTO 0-0210 TOTAL HORAS
+'THORAS
+A= "'"
+NROLEG = Legajo.nroleg
+PERACT = Legajo.Peract 
+NOVE=LEGAJO.CONCEPTO("NOVH_00210")
+TIPLIQ=LEFT(LEGAJO.CONCEPTO("VLIQ_TIPLIQ"),1)
+
+
+
+IF NOVE<>0 THEN
+
+	RESULT=NOVE
+
+ELSE
+
+	SSQL = " "
+	SSQL = SSQL + " select round(isnull(sum(usr_normalcamarista),0)*1.3333,0) from USR_CONTROLHORAS WHERE USR_PERIOD= "&PERACT
+	SSQL = SSQL + " AND USR_QUINCENA = "&TIPLIQ
+	SSQL = SSQL + " AND usr_cdLEGAJO = "&NROLEG
+	
+	CAMARIS=QUERYEXEC(CSTR(SSQL))
+
+	SSQL = " "
+	SSQL = SSQL + " select isnull(sum(usr_normalcamarista),0) from USR_CONTROLHORAS WHERE USR_PERIOD= "&PERACT
+	SSQL = SSQL + " AND USR_QUINCENA = "&TIPLIQ
+	SSQL = SSQL + " AND usr_cdLEGAJO = "&NROLEG
+	
+	CAMARIS2=QUERYEXEC(CSTR(SSQL))
+
+	SSQL = " "
+	SSQL = SSQL + " select isnull(sum(usr_totalhs),0) from USR_CONTROLHORAS WHERE USR_PERIOD= "&PERACT
+	SSQL = SSQL + " AND USR_QUINCENA = "&TIPLIQ
+	SSQL = SSQL + " AND usr_cdLEGAJO = "&NROLEG
+
+	RESULT=QUERYEXEC(CSTR(SSQL))+CAMARIS-CAMARIS2
+
+END IF
